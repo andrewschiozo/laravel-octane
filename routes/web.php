@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return response()->json([
         'message' => 'Hello World',
+        'deploy'  => 'Ok',
         'timestamp' => now()->toIso8601String()
     ]);
 });
