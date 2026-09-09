@@ -23,7 +23,7 @@ jobs:
         run: composer install --no-dev --optimize-autoloader --no-progress --no-interaction
 
       - name: Deploy via SSH to Oracle Cloud
-        uses: appleboy/ssh-action@1.2.0
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
@@ -32,22 +32,17 @@ jobs:
           script: |
             cd /var/www/laravel
 
-            # 1. Puxa o código novo do GitHub
             git pull origin main
 
-            # 2. Injeta o arquivo .env seguro que configuramos nas Secrets
             echo "${{ secrets.DOT_ENV_PRODUCTION }}" > .env
 
-            # 3. Instala as dependências internamente
             composer install --no-dev --optimize-autoloader
 
-            # 4. Roda as otimizações de cache de memória que conversamos
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
 
-            # 5. Executa as migrations do banco de dados de forma forçada
             php artisan migrate --force
 
-            # 6. Dá o comando mágico para o Octane atualizar os workers sem derrubar o site
+            # laravel octane atualizar os workers
             php artisan octane:reload
