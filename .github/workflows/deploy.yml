@@ -23,7 +23,7 @@ jobs:
         run: composer install --no-dev --optimize-autoloader --no-progress --no-interaction
 
       - name: Deploy via SSH to Oracle Cloud
-        uses: appleboy/ssh-action@1.2.5
+        uses: appleboy/ssh-action@1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
