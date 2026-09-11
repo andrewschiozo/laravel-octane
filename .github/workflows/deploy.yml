@@ -20,7 +20,7 @@ jobs:
           coverage: none
 
       - name: Create Production .env file
-        uses: jasonmccreary/create-env-file@v3
+        uses: jasonmccreary/dotfiles@master
         with:
           env-id: production
           content: |
