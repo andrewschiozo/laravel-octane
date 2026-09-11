@@ -117,6 +117,7 @@ return [
         'oracle' =>
         [
             'driver'         => 'oracle',
+            'url'            => env('DB_URL'),
             'tns'            => env('DB_DATABASE'),
             'host'           => env('DB_HOST', ''),
             'port'           => env('DB_PORT', '1522'),
