@@ -37,6 +37,8 @@ jobs:
 
             echo "${{ secrets.DOT_ENV_PRODUCTION }}" > .env
 
+            echo "DB_URL=\"$DB_URL_PROD\"" >> .env
+
             composer install --no-dev --optimize-autoloader
 
             php artisan config:cache
