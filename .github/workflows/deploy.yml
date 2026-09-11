@@ -20,7 +20,8 @@ jobs:
           coverage: none
 
       - name: Install Composer Dependencies
-        run: composer install --no-dev --optimize-autoloader --no-progress --no-interaction
+        run: composer install --no-dev --optimize-autoloader --no-progress --no-interaction --ignore-platform-reqs
+
 
       - name: Deploy via SSH to Oracle Cloud
         uses: appleboy/ssh-action@master
