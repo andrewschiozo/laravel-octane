@@ -42,14 +42,14 @@ jobs:
             php artisan view:clear
             rm -f bootstrap/cache/config.php
 
-            cat << 'EOF' > .env
+            cat << EOF > .env
             ${{ secrets.DOT_ENV_PRODUCTION }}
-            DB_URL="$DB_URL_PROD"
+            DB_URL="${DB_URL_PROD}"
             EOF
 
-            echo "=== DEBUG: O .ENV DE PRODUÇÃO ==="
-            php artisan env:encrypt --key=debug --output=.env.debug > /dev/null
-            grep -E "^DB_" .env || echo "Nenhuma variável DB_ encontrada no arquivo!"
+            # 3. COMANDO DE DEBUG: Agora vai exibir os asteriscos se expandir certo!
+            echo "=== DEBUG: O QUE ESTÁ ESCRITO NO .ENV DE PRODUÇÃO ==="
+            grep -E "^DB_" .env || echo "Nenhuma variável DB_ encontrada!"
             echo "======================================================"
 
             composer install --no-dev --optimize-autoloader
