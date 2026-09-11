@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v5
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -19,18 +19,24 @@ jobs:
           extensions: mbstring, xml, bcmath, curl, zip, intl, oci8
           coverage: none
 
-      - name: Install Composer Dependencies
-        run: composer install --no-dev --optimize-autoloader --no-progress --no-interaction --ignore-platform-reqs
+      - name: Create Production .env file
+        uses: jasonmccreary/create-env-file@v3
+        with:
+          env-id: production
+          content: |
+            ${{ secrets.DOT_ENV_PRODUCTION }}
+            DB_URL="${{ secrets.DB_URL_PRODUCTION }}"
 
+      - name: Install Composer Dependencies
+        run: composer install --no-dev --optimize-autoloader --no-progress --no-interaction
 
       - name: Deploy via SSH to Oracle Cloud
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
-          envs: DB_URL_PROD
           script: |
             cd /var/www/laravel
 
@@ -40,17 +46,15 @@ jobs:
             php artisan config:clear
             php artisan route:clear
 
-            echo "${{ secrets.DOT_ENV_PRODUCTION }}" > .env
-
-            echo "DB_URL=\"$DB_URL_PROD\"" >> .env
+            cat << 'EOF' > .env
+            ${{ env.production }}
+            EOF
 
             composer install --no-dev --optimize-autoloader
 
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
-            php artisan migrate --force
 
+            php artisan migrate --force
             php artisan octane:reload
-        env:
-          DB_URL_PROD: ${{ secrets.DB_URL_PRODUCTION }}
