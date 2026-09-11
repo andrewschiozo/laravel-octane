@@ -34,31 +34,24 @@ jobs:
           script: |
             cd /var/www/laravel
 
-            # 1. Alinha o código do servidor com o GitHub
             git fetch origin
             git reset --hard origin/main
 
-            # 2. Limpa os caches antigos para não ler lixo na memória
             php artisan config:clear
             php artisan route:clear
+            php artisan view:clear
 
-            # 3. CRIAÇÃO NATIVA E BLINDADA DO .ENV (Sem plugins)
-            # O 'EOF' em aspas simples impede o Bash de quebrar com os parênteses da Oracle
             cat << 'EOF' > .env
             ${{ secrets.DOT_ENV_PRODUCTION }}
             DB_URL="$DB_URL_PROD"
             EOF
 
-            # 4. Atualiza os pacotes internos do projeto
             composer install --no-dev --optimize-autoloader
 
-            # 5. Compila as novas configurações em cache
+            php artisan migrate --force
+
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
 
-            # 6. Roda o banco e recarrega os workers do Octane
-            php artisan migrate --force
             php artisan octane:reload
-        env:
-          DB_URL_PROD: ${{ secrets.DB_URL_PRODUCTION }}
