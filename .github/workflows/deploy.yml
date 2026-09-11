@@ -47,9 +47,10 @@ jobs:
             DB_URL="$DB_URL_PROD"
             EOF
 
-            echo "=== DEBUG: CONFIGURAÇÃO DO DRIVER ORACLE ==="
-            php -r "include 'vendor/autoload.php'; \$app = include 'bootstrap/app.php'; \$app->make('kernel')->bootstrap(); print_r(config('database.connections.oracle'));"
-            echo "============================================"
+            echo "=== DEBUG: O .ENV DE PRODUÇÃO ==="
+            php artisan env:encrypt --key=debug --output=.env.debug > /dev/null
+            grep -E "^DB_" .env || echo "Nenhuma variável DB_ encontrada no arquivo!"
+            echo "======================================================"
 
             composer install --no-dev --optimize-autoloader
 
