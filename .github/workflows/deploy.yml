@@ -40,11 +40,16 @@ jobs:
             php artisan config:clear
             php artisan route:clear
             php artisan view:clear
+            rm -f bootstrap/cache/config.php
 
             cat << 'EOF' > .env
             ${{ secrets.DOT_ENV_PRODUCTION }}
             DB_URL="$DB_URL_PROD"
             EOF
+
+            echo "=== DEBUG: CONFIGURAÇÃO DO DRIVER ORACLE ==="
+            php -r "include 'vendor/autoload.php'; \$app = include 'bootstrap/app.php'; \$app->make('kernel')->bootstrap(); print_r(config('database.connections.oracle'));"
+            echo "============================================"
 
             composer install --no-dev --optimize-autoloader
 
@@ -55,3 +60,5 @@ jobs:
             php artisan view:cache
 
             php artisan octane:reload
+        env:
+          DB_URL_PROD: ${{ secrets.DB_URL_PRODUCTION }}
