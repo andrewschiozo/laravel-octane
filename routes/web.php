@@ -15,3 +15,9 @@ Route::get('/home', function () {
         'foo' => 'bar'
     ]);
 });
+
+Route::get('/welcome', function () {
+    return response()->json([
+        'message' => 'ok'
+    ]);
+});
