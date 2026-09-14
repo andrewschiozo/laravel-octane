@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  laravel-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend-laravel-octane
+    ports:
+      - "8000:8000"
+      - "82:82"      # porta admin do FrankenPHP
+    volumes:
+      - .:/var/www/html/laravel
+    environment:
+      - APP_ENV=local
+    env_file:
+      - .env
+    networks:
+      - laravel-network
+
+networks:
+  laravel-network:
+    driver: bridge
