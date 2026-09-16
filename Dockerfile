@@ -1,4 +1,4 @@
-FROM php:8.5-cli-alpine
+FROM dunglas/frankenphp:1-php8.5-alpine
 
 # dependências
 RUN apk add --no-cache \
@@ -9,28 +9,48 @@ RUN apk add --no-cache \
     libaio-dev \
     build-base \
     autoconf \
-    libtool
+    libtool \
+    ca-certificates \
+    gcompat \
+    libc6-compat
+
+RUN ln -s /lib/libc.so.6 /usr/lib/libresolv.so.2
 
 # Oracle Instant Client
-RUN mkdir -p /opt/oracle && cd /opt/oracle && \
-    curl -o instantclient.zip https://oracle.com && \
-    curl -o instantclient-sdk.zip https://oracle.com && \
-    unzip instantclient.zip && unzip instantclient-sdk.zip && \
-    rm instantclient.zip instantclient-sdk.zip && \
-    ln -s /opt/oracle/instantclient_* /opt/oracle/instantclient
+RUN mkdir -p /opt/oracle && cd /opt/oracle
+
+WORKDIR /opt/oracle
+
+RUN curl -o instantclient.zip https://download.oracle.com/otn_software/linux/instantclient/instantclient-basic-linuxx64.zip
+
+RUN curl -o instantclient-sdk.zip https://download.oracle.com/otn_software/linux/instantclient/instantclient-sdk-linuxx64.zip
+
+RUN unzip instantclient.zip
+
+RUN unzip -o instantclient-sdk.zip
+
+RUN rm instantclient.zip instantclient-sdk.zip
+
+RUN ln -s /opt/oracle/instantclient_* /opt/oracle/instantclient
 
 # variáveis de ambiente para o driver da Oracle
 ENV LD_LIBRARY_PATH=/opt/oracle/instantclient
 ENV TNS_ADMIN=/opt/oracle/instantclient/network/admin
+ENV ORACLE_HOME=/opt/oracle/instantclient/
 
 # extensão oci8 - php
-RUN echo "instantclient,/opt/oracle/instantclient" | pecl install oci8 && \
-    docker-php-ext-enable oci8
+RUN echo "instantclient,/opt/oracle/instantclient" | pecl install oci8
+
+RUN docker-php-ext-enable oci8
+
+RUN docker-php-ext-install pcntl
 
 # composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www/laravel
+WORKDIR /var/www
+
+COPY composer.json composer.json
 
 # tráfego
 EXPOSE 8000
