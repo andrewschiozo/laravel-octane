@@ -32,7 +32,7 @@ jobs:
 
           envs: DB_TNS_PROD
           script: |
-            cd /var/www/laravel
+            cd /var/www
 
             git fetch origin
             git reset --hard origin/main
