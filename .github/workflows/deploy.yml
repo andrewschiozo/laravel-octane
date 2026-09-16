@@ -30,7 +30,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: 22
 
-          envs: DB_URL_PROD
+          envs: DB_TNS_PROD
           script: |
             cd /var/www/laravel
 
@@ -44,7 +44,7 @@ jobs:
 
             cat << EOF > .env
             ${{ secrets.DOT_ENV_PRODUCTION }}
-            DB_URL="${DB_URL_PROD}"
+            DB_TNS="${DB_TNS_PROD}"
             EOF
 
             # 3. COMANDO DE DEBUG: Agora vai exibir os asteriscos se expandir certo!
@@ -60,6 +60,6 @@ jobs:
             php artisan route:cache
             php artisan view:cache
 
-            php artisan octane:reload
+            sudo systemctl restart laravel-octane
         env:
-          DB_URL_PROD: ${{ secrets.DB_URL_PRODUCTION }}
+          DB_TNS_PROD: ${{ secrets.DB_TNS_PRODUCTION }}
